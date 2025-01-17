@@ -8,3 +8,11 @@ Route::get('/', function () {
 });
 
 Route::resource('products', ProductController::class);
+
+use Illuminate\Support\Facades\Cache;
+
+Route::get('/cache-test', function () {
+    Cache::put('cache_key', 'cache_value', 300);
+    return Cache::get('cache_key');
+});
+

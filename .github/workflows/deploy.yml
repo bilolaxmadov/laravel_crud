@@ -1,0 +1,36 @@
+name: Laravel CI/CD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Repozitoriyani klonlash
+      uses: actions/checkout@v2
+
+    - name: PHP o'rnatish
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: 8.1
+        extensions: mbstring, bcmath, pdo, tokenizer, xml
+
+    - name: Composer paketlarini o‘rnatish
+      run: composer install --no-dev --optimize-autoloader
+
+    - name: Laravel konfiguratsiyasi va keshlarni yangilash
+      run: |
+        cp .env.example .env
+        php artisan key:generate
+        php artisan config:cache
+        php artisan route:cache
+        php artisan view:cache
+
+    - name: Web serverga joylashtirish (deployment)
+      run: |
+        rsync -avz --exclude '.env' --exclude 'storage' . user@your-server-ip:/path/to/laravel_project
+
